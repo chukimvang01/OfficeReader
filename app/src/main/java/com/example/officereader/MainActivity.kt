@@ -22,6 +22,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -65,6 +66,9 @@ fun NavigationApp(navController: NavHostController) {
         composable(NavigationItem.Excel.route) {
             ExcelScreen()
         }
+        composable(NavigationItem.Setting.route) {
+            SettingScreen()
+        }
     }
 }
 
@@ -79,14 +83,8 @@ fun TopBar() {
 }
 
 @Composable
-fun BottomNavigationBar(navController: NavController) {
-    val items = listOf(
-        NavigationItem.Pdf,
-        NavigationItem.Docx,
-        NavigationItem.Txt,
-        NavigationItem.Ppt,
-        NavigationItem.Excel
-    )
+fun BottomNavigationBar(viewModel: HomeViewModel, navController: NavController) {
+    val items = viewModel.state.value.menuBottomBar.values.toList()
     BottomNavigation(
         backgroundColor = colorResource(id = R.color.purple_200),
         contentColor = Color.White
@@ -99,40 +97,45 @@ fun BottomNavigationBar(navController: NavController) {
                         contentDescription = item.title
                     )
                 },
-                label = { Text(text = item.title) },
+//                label = { Text(text = item.title) },
                 selectedContentColor = Color.White,
                 unselectedContentColor = Color.White.copy(0.4f),
                 alwaysShowLabel = true,
-                selected = false,
+                selected = item.idx == viewModel.state.value.numberActive,
                 onClick = {
-                    navController.navigate(item.route) {
-                        // Pop up to the start destination of the graph to
-                        // avoid building up a large stack of destinations
-                        // on the back stack as users select items
-                        navController.graph.startDestinationRoute?.let { route ->
-                            popUpTo(route) {
-                                saveState = true
-                            }
-                        }
-                        // Avoid multiple copies of the same destination when
-                        // reselecting the same item
-                        launchSingleTop = true
-                        // Restore state when reselecting a previously selected item
-                        restoreState = true
-                    }
+                    FwScreen(viewModel, navController, item)
                 })
         }
+    }
+}
+
+fun FwScreen(viewModel: HomeViewModel, navController: NavController, item: NavigationItem) {
+    navController.navigate(item.route) {
+        // Pop up to the start destination of the graph to
+        // avoid building up a large stack of destinations
+        // on the back stack as users select items
+        navController.graph.startDestinationRoute?.let { route ->
+            popUpTo(route) {
+                saveState = true
+            }
+        }
+        // Avoid multiple copies of the same destination when
+        // reselecting the same item
+        launchSingleTop = true
+        // Restore state when reselecting a previously selected item
+        restoreState = true
+        viewModel.updateActiveScreen(item.idx)
     }
 }
 
 @Composable
 fun HomeScreen() {
     val navController = rememberNavController()
-    var direction = remember { mutableStateOf(-1) }
-    print("start homescreen")
+    val direction = remember { mutableStateOf(-1) }
+    val viewModel: HomeViewModel = viewModel()
     Scaffold(
         topBar = { TopBar() },
-        bottomBar = { BottomNavigationBar(navController) },
+        bottomBar = { BottomNavigationBar(viewModel, navController) },
         content = { paddingValues ->
             Box(
                 modifier = Modifier
@@ -141,7 +144,6 @@ fun HomeScreen() {
                         detectDragGestures(
                             onDrag = { change, dragAmount ->
                                 change.consume()
-
                                 val (x, y) = dragAmount
                                 if (abs(x) > abs(y)) {
                                     when {
@@ -154,39 +156,23 @@ fun HomeScreen() {
                                             direction.value = 1
                                         }
                                     }
-                                } else {
-                                    when {
-                                        y > 0 -> {
-                                            // down
-                                            direction.value = 2
-                                        }
-                                        y < 0 -> {
-                                            // up
-                                            direction.value = 3
-                                        }
-                                    }
                                 }
-
                             },
                             onDragEnd = {
-                                when (direction.value){
+                                when (direction.value) {
                                     0 -> {
                                         //right swipe code here
-                                        Log.i("Swipe: ","swipe right")
-                                        }
-                                        1 -> {
-                                            // left swipe code here
-                                            Log.i("Swipe: ","swipe left")
-                                        }
-                                        2 -> {
-                                            // down swipe code here
-                                            Log.i("Swipe: ","swipe down")
-                                        }
-                                        3 -> {
-                                            // up swipe code here
-                                            Log.i("Swipe: ","swipe up")
-                                        }
+                                        Log.i("Swipe: ", "swipe right")
+                                        val rsLeft: Int = viewModel.swipeRightUpdateState()
+                                        FwScreen(viewModel,navController,viewModel.getItemScreenActive(rsLeft))
                                     }
+                                    1 -> {
+                                        // left swipe code here
+                                        Log.i("Swipe: ", "swipe left")
+                                        val rsRight: Int = viewModel.swipeLeftUpdateState()
+                                        FwScreen(viewModel,navController,viewModel.getItemScreenActive(rsRight))
+                                    }
+                                }
                             })
                     }) {
                 NavigationApp(navController = navController)
@@ -330,4 +316,29 @@ fun ExcelScreen() {
 @Composable
 fun ProfileScreenPreview() {
     ExcelScreen()
+}
+
+@Composable
+fun SettingScreen() {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(colorResource(id = R.color.colorPrimaryDark))
+            .wrapContentSize(Alignment.Center)
+    ) {
+        Text(
+            text = "Setting View",
+            fontWeight = FontWeight.Bold,
+            color = Color.White,
+            modifier = Modifier.align(Alignment.CenterHorizontally),
+            textAlign = TextAlign.Center,
+            fontSize = 25.sp
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun SettingScreenPreview() {
+    SettingScreen()
 }
