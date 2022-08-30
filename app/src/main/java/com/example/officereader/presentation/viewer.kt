@@ -1,13 +1,14 @@
 package com.example.officereader.presentation
 
-import android.content.Context
-import android.content.Intent
+import android.content.*
 import android.graphics.Bitmap
 import android.graphics.pdf.PdfRenderer
 import android.net.Uri
+import android.os.Build
 import android.os.ParcelFileDescriptor
+import android.provider.MediaStore
 import android.util.Log
-import androidx.compose.foundation.Image
+import android.util.Size
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -21,7 +22,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toFile
 import coil.compose.AsyncImage
-import coil.compose.AsyncImagePainter
 import coil.imageLoader
 import coil.memory.MemoryCache
 import coil.request.ImageRequest
@@ -178,4 +178,14 @@ fun OpenFile(context: Context, url: File){
 
     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
     context.startActivity(intent)
+}
+
+@Composable
+fun getThumbnail(context: Context, contentUri: Uri, width: Int, height: Int, imageId: Long): Bitmap {
+    val mContentResolver: ContentResolver = context.contentResolver
+    if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)) {
+        return mContentResolver.loadThumbnail(contentUri, Size(width / 2, height / 2), null)
+    } else {
+        return MediaStore.Images.Thumbnails.getThumbnail(mContentResolver, imageId, MediaStore.Images.Thumbnails.MINI_KIND, null)
+    }
 }
