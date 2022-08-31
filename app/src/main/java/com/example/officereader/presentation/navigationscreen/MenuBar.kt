@@ -1,5 +1,6 @@
 package com.example.officereader.presentation.navigationscreen
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -27,21 +28,30 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.officereader.R
-import com.example.officereader.data.menu.NavDrawerItem
 import com.example.officereader.data.menu.NavigationItem
 import com.example.officereader.data.menu.TabItem
 import com.example.officereader.presentation.homescreen.HomeViewModel
-import com.google.accompanist.pager.*
+import com.google.accompanist.pager.ExperimentalPagerApi
+import com.google.accompanist.pager.HorizontalPager
+import com.google.accompanist.pager.PagerState
+import com.google.accompanist.pager.pagerTabIndicatorOffset
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun TopBar(scope: CoroutineScope, scaffoldState: ScaffoldState) {
+fun TopBar(scope: CoroutineScope, scaffoldState: ScaffoldState, state: ModalBottomSheetState) {
     TopAppBar(
         title = { Text(text = stringResource(R.string.app_name), fontSize = 18.sp) },
         navigationIcon = {
-            IconButton(onClick = { scope.launch { scaffoldState.drawerState.open() } }) {
+            IconButton(onClick = {
+                Log.i("Draw CLick", "xxx")
+                scope.launch {
+                    scaffoldState.drawerState.open()
+//                    state.show()
+                }
+            }) {
                 Icon(Icons.Filled.Menu, "")
             }
         },
@@ -124,6 +134,7 @@ fun Tabs(tabs: List<TabItem>, pagerState: PagerState) {
     }
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @ExperimentalPagerApi
 @Composable
 fun TabsContent(tabs: List<TabItem>, pagerState: PagerState) {
@@ -135,20 +146,21 @@ fun TabsContent(tabs: List<TabItem>, pagerState: PagerState) {
 @Composable
 fun Drawer(scope: CoroutineScope, scaffoldState: ScaffoldState, navController: NavController) {
     val items = listOf(
-        NavDrawerItem.Home,
-        NavDrawerItem.Recent,
-        NavDrawerItem.Favorite,
-        NavDrawerItem.Setting
+        NavigationItem.Home,
+        NavigationItem.Recent,
+        NavigationItem.Favorite,
+        NavigationItem.Setting
     )
-    Column(modifier = Modifier.background(colorResource(id = R.color.colorPrimary))) {
+    Column(modifier = Modifier.background(colorResource(id = R.color.purple_500))) {
         // Header
         Image(
             painter = painterResource(id = R.drawable.baseline_home_24),
-            contentDescription = R.drawable.baseline_home_24.toString(),
+            contentDescription = "Vangck",
             modifier = Modifier
                 .height(100.dp)
                 .fillMaxWidth()
-                .padding(10.dp)
+                .padding(10.dp),
+            colorFilter = ColorFilter.tint(Color.White)
         )
         // Space between
         Spacer(
@@ -162,7 +174,25 @@ fun Drawer(scope: CoroutineScope, scaffoldState: ScaffoldState, navController: N
         val currentRoute = navBackStackEntry?.destination?.route
         items.forEach { item ->
             DrawerItem(item = item, selected = currentRoute == item.route, onItemClick = {
-                /* Add code later */
+                navController.navigate(item.route) {
+                    // Pop up to the start destination of the graph to
+                    // avoid building up a large stack of destinations
+                    // on the back stack as users select items
+                    navController.graph.startDestinationRoute?.let { route ->
+                        popUpTo(route) {
+                            saveState = true
+                        }
+                    }
+                    // Avoid multiple copies of the same destination when
+                    // reselecting the same item
+                    launchSingleTop = true
+                    // Restore state when reselecting a previously selected item
+                    restoreState = true
+                }
+                // Close drawer
+                scope.launch {
+                    scaffoldState.drawerState.close()
+                }
             })
         }
         Spacer(modifier = Modifier.weight(1f))
@@ -179,8 +209,8 @@ fun Drawer(scope: CoroutineScope, scaffoldState: ScaffoldState, navController: N
 }
 
 @Composable
-fun DrawerItem(item: NavDrawerItem, selected: Boolean, onItemClick: (NavDrawerItem) -> Unit) {
-    val background = if (selected) R.color.colorPrimaryDark else android.R.color.transparent
+fun DrawerItem(item: NavigationItem, selected: Boolean, onItemClick: (NavigationItem) -> Unit) {
+    val background = if (selected) R.color.colorPrimary else android.R.color.transparent
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier

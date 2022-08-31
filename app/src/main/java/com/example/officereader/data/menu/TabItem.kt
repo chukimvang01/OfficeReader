@@ -1,7 +1,9 @@
 package com.example.officereader.data.menu
 
+import androidx.compose.material.ModalBottomSheetState
 import androidx.compose.runtime.Composable
 import com.example.officereader.*
+import kotlinx.coroutines.CoroutineScope
 
 typealias ComposableFun = @Composable () -> Unit
 sealed class TabItem(var icon: Int, var title: String, var screen: ComposableFun) {

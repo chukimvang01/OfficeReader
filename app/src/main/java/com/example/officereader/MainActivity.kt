@@ -1,12 +1,14 @@
 package com.example.officereader
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -15,7 +17,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
 import com.example.officereader.presentation.homescreen.HomeScreen
+import com.example.officereader.presentation.navigationscreen.ModalBottomSheetLayoutScreen
 import com.example.officereader.ui.theme.OfficeReaderTheme
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 
 class MainActivity : ComponentActivity() {
@@ -29,14 +35,17 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colors.background
                 ) {
                     HomeScreen()
+//                    ModalBottomSheetLayoutScreen()
                 }
             }
         }
     }
 }
-
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun PdfScreen() {
+    val scope = rememberCoroutineScope()
+    val state = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -51,6 +60,19 @@ fun PdfScreen() {
             textAlign = TextAlign.Center,
             fontSize = 25.sp
         )
+        Button(
+            colors = ButtonDefaults.buttonColors(
+                backgroundColor = colorResource(id = R.color.colorPrimary),
+                contentColor = Color.White
+            ),
+            onClick = {
+                Log.i("Click","Model bottom")
+                scope.launch {
+                    state.show()
+                }
+            }) {
+            Text(text = "Open Modal Bottom Sheet Layout")
+        }
     }
 }
 
