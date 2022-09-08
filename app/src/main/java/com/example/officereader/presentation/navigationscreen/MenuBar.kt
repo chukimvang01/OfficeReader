@@ -46,10 +46,8 @@ fun TopBar(scope: CoroutineScope, scaffoldState: ScaffoldState, state: ModalBott
         title = { Text(text = stringResource(R.string.app_name), fontSize = 18.sp) },
         navigationIcon = {
             IconButton(onClick = {
-                Log.i("Draw CLick", "xxx")
                 scope.launch {
                     scaffoldState.drawerState.open()
-//                    state.show()
                 }
             }) {
                 Icon(Icons.Filled.Menu, "")

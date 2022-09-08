@@ -36,38 +36,30 @@ fun HomeScreen() {
     val scaffoldState = rememberScaffoldState(rememberDrawerState(DrawerValue.Closed))
     val viewModel: HomeViewModel = viewModel()
     val modalBottomSheetState = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
-    ModalBottomSheetLayout(
-        sheetContent = {
-            BottomSheetContent()
+
+    Scaffold(
+        scaffoldState = scaffoldState,
+        topBar = { TopBar(scope, scaffoldState,modalBottomSheetState) },
+        bottomBar = { BottomNavigationBar(viewModel, navController) },
+        drawerBackgroundColor = colorResource(id = R.color.purple_500),
+        drawerContent = {
+            Drawer(scope = scope, scaffoldState = scaffoldState, navController = navController)
         },
-        sheetState = modalBottomSheetState,
-        sheetShape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp),
-        sheetBackgroundColor = colorResource(id = R.color.colorPrimary),
-        // scrimColor = Color.Red,  // Color for the fade background when you open/close the drawer
-    ) {
-        Scaffold(
-            scaffoldState = scaffoldState,
-            topBar = { TopBar(scope, scaffoldState,modalBottomSheetState) },
-            bottomBar = { BottomNavigationBar(viewModel, navController) },
-            drawerBackgroundColor = colorResource(id = R.color.purple_500),
-            drawerContent = {
-                Drawer(scope = scope, scaffoldState = scaffoldState, navController = navController)
-            },
-            content = { paddingValues ->
-                Box(
-                    modifier = Modifier
-                        .padding(paddingValues)
-                ) {
-                    NavigationApp(navController = navController, viewModel)
-                }
-            },
-            backgroundColor = colorResource(
-                id = R.color.purple_500
-            )
+        content = { paddingValues ->
+            Box(
+                modifier = Modifier
+                    .padding(paddingValues)
+            ) {
+                NavigationApp(navController = navController, viewModel)
+            }
+        },
+        backgroundColor = colorResource(
+            id = R.color.purple_500
         )
-    }
+    )
 }
 
+@ExperimentalMaterialApi
 @Composable
 fun NavigationApp(navController: NavHostController, viewModel: HomeViewModel) {
     NavHost(navController = navController, startDestination = NavigationItem.Home.route) {
