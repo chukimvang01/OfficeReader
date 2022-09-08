@@ -68,7 +68,7 @@ fun PdfScreen() {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(colorResource(id = R.color.purple_700))
+                .background(colorResource(id = R.color.colorPrimaryDark))
         ) {
             SearchView(state = textState)
             CountryList(navController = navController, state = textState)

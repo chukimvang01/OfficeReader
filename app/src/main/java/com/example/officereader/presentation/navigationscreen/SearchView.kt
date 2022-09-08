@@ -1,7 +1,9 @@
 package com.example.officereader.presentation.navigationscreen
 
 import android.util.Log
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -19,6 +21,8 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.res.colorResource
@@ -86,7 +90,7 @@ fun CountryListItem(countryText: String, onItemClick: (String) -> Unit) {
     Row(
         modifier = Modifier
             .clickable(onClick = { onItemClick(countryText) })
-            .background(color = Purple700)
+            .background(colorResource(id = R.color.colorPrimaryDark))
             .height(57.dp)
             .fillMaxWidth()
             .padding(paddingValues = PaddingValues(8.dp, 16.dp))
