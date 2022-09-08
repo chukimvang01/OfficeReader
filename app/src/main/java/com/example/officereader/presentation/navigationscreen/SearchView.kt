@@ -5,6 +5,10 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -28,6 +32,9 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.officereader.R
 import com.example.officereader.presentation.homescreen.HomeViewModel
+import com.example.officereader.ui.theme.Purple200
+import com.example.officereader.ui.theme.Purple500
+import com.example.officereader.ui.theme.Purple700
 import java.util.*
 
 @Composable
@@ -66,7 +73,7 @@ fun SearchView(state: MutableState<TextFieldValue>) {
             cursorColor = Color.White,
             leadingIconColor = Color.White,
             trailingIconColor = Color.White,
-            backgroundColor = colorResource(id = R.color.colorPrimary),
+            backgroundColor = colorResource(id = R.color.colorPrimaryDark),
             focusedIndicatorColor = Color.Transparent,
             unfocusedIndicatorColor = Color.Transparent,
             disabledIndicatorColor = Color.Transparent
@@ -79,9 +86,7 @@ fun CountryListItem(countryText: String, onItemClick: (String) -> Unit) {
     Row(
         modifier = Modifier
             .clickable(onClick = { onItemClick(countryText) })
-            .background(
-                colorResource(id = R.color.colorPrimaryDark)
-            )
+            .background(color = Purple700)
             .height(57.dp)
             .fillMaxWidth()
             .padding(paddingValues = PaddingValues(8.dp, 16.dp))
@@ -94,8 +99,12 @@ fun CountryListItem(countryText: String, onItemClick: (String) -> Unit) {
 fun CountryList(navController: NavController, state: MutableState<TextFieldValue>) {
     val viewModel: HomeViewModel = viewModel()
     val countries = viewModel.getListOfCountries()
+    val stateGrid = rememberLazyGridState()
     var filterCountries: ArrayList<String>
-    LazyColumn(modifier = Modifier.fillMaxWidth()) {
+    LazyVerticalGrid(columns = GridCells.Adaptive(minSize = 150.dp),
+        state = stateGrid,
+        contentPadding = PaddingValues(10.dp),
+        modifier = Modifier.fillMaxWidth()) {
         val searchText = state.value.text
         filterCountries = if (searchText.isEmpty()) {
             countries

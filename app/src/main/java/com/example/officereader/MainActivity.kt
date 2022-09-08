@@ -68,23 +68,23 @@ fun PdfScreen() {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(colorResource(id = R.color.colorPrimaryDark))
+                .background(colorResource(id = R.color.purple_700))
         ) {
             SearchView(state = textState)
             CountryList(navController = navController, state = textState)
-            Button(
-                colors = ButtonDefaults.buttonColors(
-                    backgroundColor = colorResource(id = R.color.colorPrimary),
-                    contentColor = Color.White
-                ),
-                onClick = {
-                    Log.i("Click","Model bottom")
-                    scope.launch {
-                        state.show()
-                    }
-                }) {
-                Text(text = "Open Modal Bottom Sheet Layout")
-            }
+//            Button(
+//                colors = ButtonDefaults.buttonColors(
+//                    backgroundColor = colorResource(id = R.color.colorPrimary),
+//                    contentColor = Color.White
+//                ),
+//                onClick = {
+//                    Log.i("Click","Model bottom")
+//                    scope.launch {
+//                        state.show()
+//                    }
+//                }) {
+//                Text(text = "Open Modal Bottom Sheet Layout")
+//            }
         }
     }
 
